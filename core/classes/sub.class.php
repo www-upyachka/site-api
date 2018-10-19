@@ -1,91 +1,89 @@
 <?php
-	class sub {
-		function create($address, $name, $description) {
-			global $config;
-			if(empty($address)) {
-				api::error("Адрес пустой");
-			}
-			elseif(empty($name)) {
-				api::error("Имя пустое");
-			}
-			elseif(empty($description)) {
-				api::error("Опейсание пустое");
-			}
-			elseif(preg_match('/^[0-9]/iuU', $address)) {
-				api::error("По техническим причинам адрес не может начинаться с числа. Можно в начале добавить _");
-			}
-			else {
-				$sub_exists = R::getAll("SELECT * FROM `otake_subpages` WHERE `address` = ? AND `hidden` = 0", array($address));
-				if(empty($sub_exists)) {
-					R::exec("INSERT INTO `otake_subpages`(`address`, `name`, `description`, `admin`, `hidden`, `create_time`) VALUES (?, ?, ?, ?, ?, ?)", array($address, $name, $description, $_SESSION['user'], 0, time()));
-					api::success('Раздел создан');
-				}
-				else {
-					api::error("Раздел с таким адресом уже существует");
-				}
-			}
+	class sub
+	{
+		public function info($address)
+		{
+			$info = R::getAll("SELECT * FROM `otake_subpages` WHERE `address` = ?", [$address]);
+			return $info;
 		}
-		function is_exists($address) {
-			global $config;
-			$sub_exists = R::getAll("SELECT * FROM `otake_subpages` WHERE `address` = ? OR `id` = ? AND `hidden` = 0", array($address, $address));
-			if(!empty($sub_exists)) {
-				return true;
-			} else {
+		public function allList()
+		{
+			$list = R::getAll("SELECT * FROM `otake_subpages` ORDER BY `id` ASC");
+			return $list;
+		}
+		public function exists($address)
+		{
+			$subInfo = $this->info($address);
+			if(empty($subInfo))
+			{
 				return false;
 			}
-		}
-		function overall() {
-			global $config;
-			$overall = R::getAll("SELECT * FROM `otake_subpages` WHERE `hidden` = 0");
-			foreach ($overall as $sub) {
-                unset($sub['hidden']);
-                $_overall[] = $sub;
-			}
-            echo json_encode($_overall);
-		}
-		function info($address) {
-			global $config;
-			$sub_info = R::getAll("SELECT * FROM `otake_subpages` WHERE `id` = ? OR `address` = ? AND `hidden` = 0", array($address, $address));
-			if(!empty($sub_info)) {
-				echo "<h2>" . htmlspecialchars($sub_info[0]['name']) . "</h2>";
-				echo "<a href='{$config['site_url']}/sub/{$sub_info[0]['address']}/manage/'>Президентская лажа</a>";
+			else
+			{
+				return true;
 			}
 		}
-		static function sub_info($address)
+		public function create($address, $name, $description)
 		{
-			$sub = R::getAll("SELECT * FROM `otake_subpages` WHERE `address` = ? OR `id` = ? AND `hidden` = 0", array($address, $address));
-			unset($sub[0]['hidden']);
-			$sub = $sub[0];
-			if(!empty($sub))
-            {
-                return json_encode($sub);
-            }
-            else
-            {
-                return api::error("Раздел не существуе!!1");
-            }
+			R::exec("INSERT INTO `otake_subpages`(`address`, `name`, `description`, `admin`, `hidden`, `create_time`) VALUES (?, ?, ?, ?, ?, ?)", [$address, $name, $description, $GLOBALS['username'], 0, time()]);
 		}
-		static function arrayInfo($address)
-        {
-            return R::getAll("SELECT * FROM `otake_subpages` WHERE `address` = ? OR `id` = ? AND `hidden` = 0", array($address, $address));
-        }
-		function posts($address, $page) {
-		    $limit = 40;
-		    $begin = $page * $limit;
-			$posts = R::getAll("SELECT * FROM `otake_posts` WHERE `sub` = ? AND `deleted` = 0 ORDER BY `bumped` DESC LIMIT $begin,$limit", array($address));
-            return json_encode($posts);
+		public function edit($address, $name, $description)
+		{
+			R::exec("UPDATE `otake_subpages` SET `name` = ?, `description` = ? WHERE `address` = ?", [$name, $description, $address]);
 		}
-		function is_mod($user, $sub)
-        {
-            $sub_info = self::arrayInfo($sub);
-            if($sub_info['admin'] == $user)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
+		public function moderatorExists($usernick, $sub) {
+			$moderator = R::getAll("SELECT * FROM `otake_moderators` WHERE `username` = ? AND `sub` = ? AND `discontinued` = ?", [
+				$usernick,
+				$sub,
+				0
+			]);
+			return $moderator;
+		}
+		public function addModerator($usernick, $sub) {
+			$modlog = new modlog();
+			R::exec("INSERT INTO `otake_moderators`(`username`, `date`, `king`, `sub`, `discontinued`, `discontinued_in_date`) VALUES (?, ?, ?, ?, ?, ?)", [
+				$usernick,
+				time(),
+				$GLOBALS['username'],
+				$sub,
+				0,
+				0
+			]);
+			$modlog->addEntry(
+				$GLOBALS['username'],
+				'add_mod',
+				0,
+				0,
+				$sub,
+				$usernick,
+				time()
+			);
+		}
+		public function removeModerator($usernick, $sub) {
+			$modlog = new modlog();
+			R::exec("UPDATE `otake_moderators` SET `discontinued` = ?, `discontinued_in_date` = ?, `discontinued_by` = ? WHERE `sub` = ? AND `username` = ?", [
+				1,
+				time(),
+				$GLOBALS['username'],
+				$sub,
+				$usernick
+			]);
+			$modlog->addEntry(
+				$GLOBALS['username'],
+				'remove_mod',
+				0,
+				0,
+				$sub,
+				$usernick,
+				time()
+			);
+		}
+		public function mods($sub) {
+			$mods = R::getAll("SELECT * FROM `otake_moderators` WHERE `sub` = ? AND `discontinued` = ?", [
+				$sub,
+				0
+			]);
+			return $mods;
+		}
 	}
 ?>

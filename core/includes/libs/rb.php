@@ -193,7 +193,7 @@ class Debug extends RDefault implements Logger
 	/**
 	 * @var integer
 	 */
-	private $strLen = 40;
+	private $strLen = 10000;
 
 	/**
 	 * @var boolean
