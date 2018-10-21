@@ -8,16 +8,16 @@
 	require "core/includes/includes.php";
 	$user = new user;
 	$api = new api;
-	if(isset($_GET['access_token']))
+	if(isset($_REQUEST['access_token']))
 	{
-		if($user->tokenIsValid($_GET['access_token']))
+		if($user->tokenIsValid($_REQUEST['access_token']))
 		{
-			$tokenInfo = $user->tokenByCode($_GET['access_token']);
+			$tokenInfo = $user->tokenByCode($_REQUEST['access_token']);
 			$GLOBALS['username'] = $tokenInfo[0]['for_user'];
 			$GLOBALS['currentUserInfo'] = $user->info($tokenInfo[0]['for_user']);
 		}
 	}
-	if(!isset($_GET['method']))
+	if(!isset($_REQUEST['method']))
 	{
 		echo $api->error_no_method();
 	}
@@ -26,7 +26,7 @@
 	}
 	else
 	{
-		$method = $_GET['method'];
+		$method = $_REQUEST['method'];
 		echo $api->start_method($method);
 	}
 ?>
