@@ -72,7 +72,7 @@
 			R::exec("UPDATE `otake_posts` SET `deleted` = 1 WHERE `id` = ?", [$id]);
 			$modlog = new modlog;
 			$postInfo = $this->info($id);
-			$modlog->addEntry($GLOBALS['username'], "delete_psto", $_GET['id'], 0, $postInfo[0]['sub'], $postInfo[0]['author'], time());
+			$modlog->addEntry($GLOBALS['username'], "delete_psto", $id, 0, $postInfo[0]['sub'], $postInfo[0]['author'], time());
 		}
 		public function versions($id)
 		{
