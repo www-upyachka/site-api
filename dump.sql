@@ -245,7 +245,7 @@ DROP TABLE IF EXISTS `otake_modlog`;
 CREATE TABLE `otake_modlog` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `moderator` varchar(250) NOT NULL,
-  `type` enum('delete_psto','edit_psto','delete_comment','edit_comment','recovery_psto','recovery_comment','edit_sub','add_mod','remove_mod') NOT NULL,
+  `type` enum('delete_psto','edit_psto','delete_comment','edit_comment','recovery_psto','recovery_comment','edit_sub','add_mod','remove_mod','pin','unpin') NOT NULL,
   `post_id` int(11) NOT NULL,
   `comment_id` int(11) NOT NULL,
   `sub` varchar(250) NOT NULL,
@@ -285,6 +285,7 @@ CREATE TABLE `otake_posts` (
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `bumped` int(11) NOT NULL,
   `is_invited` tinyint(1) NOT NULL DEFAULT '0',
+  `is_pinned` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `author` (`author`),
   KEY `sub` (`sub`)
@@ -433,4 +434,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-10-19 22:36:45
+-- Dump completed on 2018-11-02 18:39:12
