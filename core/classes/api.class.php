@@ -776,60 +776,6 @@ class api
 					return $this->errorNoLogin();
 				}
 			}
-			elseif ($method_segments['method'] == 'pin') {
-				if($user->isLogged()) {
-					if(!isset($_REQUEST['id']) || empty($_REQUEST['id'])) {
-						return $this->error('Не выбран потс!!1');
-					}
-					else {
-						$postExists = $post->exists($_REQUEST['id']);
-						if(!$postExists) {
-							return $this->error('Потс не существуе!!1');
-						}
-						else {
-							$postInfo = $post->info($_REQUEST['id']);
-							$isMod = $user->isModInSub($GLOBALS['username'], $postInfo[0]['sub']);
-							if(!$isMod) {
-								return $this->error('Не модератор');
-							}
-							else {
-								$post->pin($_REQUEST['id']);
-								return $this->success('Потс закреплен!!1');
-							}
-						}
-					}
-				}
-				else {
-					return $this->errorNoLogin();
-				}
-			}
-			elseif ($method_segments['method'] == 'unpin') {
-				if($user->isLogged()) {
-					if(!isset($_REQUEST['id']) || empty($_REQUEST['id'])) {
-						return $this->error('Потс не выбран!!1');
-					}
-					else {
-						$postExists = $post->exists($_REQUEST['id']);
-						if(!$postExists) {
-							return $this->error('Потс не существует!!1');
-						}
-						else {
-							$postInfo = $post->info($_REQUEST['id']);
-							$isMod = $user->isModInSub($GLOBALS['username'], $postInfo[0]['sub']);
-							if(!$isMod) {
-								return $this->error('Не мочератор!!1');
-							}
-							else {
-								$post->unpin($_REQUEST['id']);
-								return $this->success('Потс откреплен!!1');
-							}
-						}
-					}
-				}
-				else {
-					return $this->errorNoLogin();
-				}
-			}
 		}
 		elseif($method_segments["module"] == "comment")
 		{
