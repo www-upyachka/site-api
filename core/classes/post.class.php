@@ -24,7 +24,7 @@
 		public function listInSub($sub, $page=0)
 		{
 			$begin = $page * $this->postsInPage;
-			return R::getAll("SELECT * FROM `otake_posts` WHERE `sub` = ? AND `deleted` = 0 ORDER BY `bumped` DESC LIMIT {$begin}, {$this->postsInPage}", array($sub));
+			return R::getAll("SELECT * FROM `otake_posts` WHERE `sub` = ? AND `deleted` = 0 ORDER BY `is_pinned` DESC, `bumped` DESC LIMIT {$begin}, {$this->postsInPage}", array($sub));
 		}
 		public function countInSub($sub)
 		{
@@ -105,6 +105,40 @@
 				1,
 				$id
 			]);
+		}
+		public function pin ($id) {
+			R::exec("UPDATE `otake_posts` SET `is_pinned` = ? WHERE `id` = ?", [
+				1,
+				$id
+			]);
+			$modlog = new modlog();
+			$postInfo = $this->info($id);
+			$modlog->addEntry(
+				$GLOBALS['username'],
+				'pin',
+				$id,
+				0,
+				$postInfo[0]['sub'],
+				$postInfo[0]['author'],
+				time()
+			);
+		}
+		public function unpin ($id) {
+			R::exec("UPDATE `otake_posts` SET `is_pinned` = ? WHERE `id` = ?", [
+				0,
+				$id
+			]);
+			$modlog = new modlog();
+			$postInfo = $this->info($id);
+			$modlog->addEntry(
+				$GLOBALS['username'],
+				'unpin',
+				$id,
+				0,
+				$postInfo[0]['sub'],
+				$postInfo[0]['author'],
+				time()
+			);
 		}
 	}
 ?>
