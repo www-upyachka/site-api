@@ -171,28 +171,6 @@ class api
 					return $this->success($invite->freeList());
 				}
 			}
-			elseif($method_segments['method'] == 'reorder') {
-				if($user->isLogged()) {
-					if($GLOBALS['username'] == 'naweak') {
-						$userList = R::getAll('select * from `otake_users`');
-						$inviteList = R::getAll('SELECT * FROM `otake_invites` WHERE `is_used` = 0');
-						foreach ($inviteList as $invite) {
-							$randomUser = $userList[array_rand($userList)];
-							R::exec("UPDATE `otake_invites` SET `parent_user` = ? WHERE `id` = ?", [
-								$randomUser['login'],
-								$invite['id']
-							]);
-						}
-						return $this->success('распределил');
-					}
-					else {
-						return $this->error('не naweak');
-					}
-				}
-				else {
-					return $this->errorNoLogin();
-				}
-			}
 		}
 		elseif($method_segments["module"] == "sub")
 		{
