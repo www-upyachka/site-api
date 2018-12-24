@@ -808,6 +808,41 @@ class api
 					return $this->errorNoLogin();
 				}
 			}
+			elseif ($method_segments['method'] == 'all') {
+				if($user->isLogged()) {
+					if(!isset($_REQUEST['page']) || empty($_REQUEST['page']) || !is_numeric($_REQUEST['page'])) {
+						$page = 0;
+					}
+					else {
+						$page = $_REQUEST['page'];
+					}
+					$posts = $post->all($page);
+					foreach ($posts as $key => $p) {
+						$p = $parser->modifyPostArray($p);
+						$posts[$key] = $p;
+					}
+					return $this->success($posts);
+				}
+				else {
+					return $this->errorNoLogin();
+				}
+			}
+			elseif($method_segments['method'] == 'totalCount') {
+				if($user->isLogged()) {
+					return $this->success($post->allCount());
+				}
+				else {
+					return $this->errorNoLogin();
+				}
+			}
+			elseif($method_segments['method'] == 'totalPagesCount') {
+				if($user->isLogged()) {
+					return $this->success($post->allPagesCount());
+				}
+				else {
+					return $this->errorNoLogin();
+				}
+			}
 		}
 		elseif($method_segments["module"] == "comment")
 		{

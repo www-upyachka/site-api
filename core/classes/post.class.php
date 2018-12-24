@@ -140,5 +140,17 @@
 				time()
 			);
 		}
+		public function all ($page) {
+			$begin = $page * $this->postsInPage;
+			return R::getAll("SELECT * FROM `otake_posts` WHERE `deleted` = 0 ORDER BY `is_pinned` DESC, `bumped` DESC LIMIT {$begin}, {$this->postsInPage}");
+		}
+		public function allCount () {
+			return R::getAll("SELECT COUNT(*) FROM `otake_posts` WHERE `deleted` = 0")[0]['COUNT(*)'];
+		}
+		public function allPagesCount() {
+			$postsCount = $this->allCount();
+			$pages = $postsCount / $this->postsInPage;
+			return round($pages);
+		}
 	}
 ?>
