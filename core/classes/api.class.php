@@ -1096,6 +1096,7 @@ class api
 							foreach ($commentsUnderPost as $key => $Comment)
 							{
 								$commentsUnderPost[$key] = $parser->modifyCommentArray($Comment);
+								$commentsUnderPost[$key]['children'] = $comment->loadChildren($Comment['id']);
 							}
 							return $this->success($commentsUnderPost);
 						}

@@ -80,5 +80,14 @@
 		{
 			return R::getAll("SELECT * FROM `otake_comments` WHERE `parent_comment` = ? AND `deleted` = 0", [$commentId]);
 		}
+		public function loadChildren ($commentId) {
+			$parser = new parser();
+			$childrens = $this->parentComments($commentId);
+			foreach ($childrens as $key => $children) {
+				$childrens[$key] = $parser->modifyCommentArray($children);
+				$childrens[$key]['children'] = $this->loadChildren($children['id']);
+			}
+			return $childrens;
+		}
 	}
 ?>
