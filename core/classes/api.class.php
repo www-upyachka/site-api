@@ -1348,6 +1348,44 @@ class api
 					return $this->errorNoLogin();
 				}
 			}
+			elseif ($method_segments['method'] == 'get') {
+				if ($user->isLogged()) {
+					if (!isset($_REQUEST['content_type']) || empty($_REQUEST['content_type'])) {
+						return $this->error("Че получать-то??7");
+					}
+					elseif (!isset($_REQUEST['content_id']) || empty($_REQUEST['content_id'])) {
+						return $this->error("Че получать-то??7");
+					}
+					else {
+						$contentType = $_REQUEST['content_type'];
+						$contentId = $_REQUEST['content_id'];
+						if (!in_array($contentType, $karma->availableContentTypes)) {
+							return $this->error("Иди нахуй");
+						}
+						elseif (in_array($contentType, ['post', 'psto'])) {
+							$advanced = $karma->onPost($contentId);
+							$count = $karma->countOnPost($contentId);
+							$result = [
+								'count' => $count,
+								'advanced' => $advanced
+							];
+							return $this->success($result);
+						}
+						elseif ($contentType == 'comment') {
+							$advanced = $karma->onComment($contentId);
+							$count = $karma->countOnComment($contentId);
+							$result = [
+								'count' => $count,
+								'advanced' => $advanced
+							];
+							return $this->success($result);
+						}
+					}
+				}
+				else {
+					return $this->errorNoLogin();
+				}
+			}
 			elseif($method_segments['method'] == 'ofUser') {
 				if($user->isLogged()) {
 					if(!isset($_REQUEST['username']) || empty($_REQUEST['username'])) {
