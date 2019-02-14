@@ -49,8 +49,8 @@
 		public function modifyPostArray($post)
 		{
 			$user = new user();
-			$post['author'] = htmlspecialchars($post['author']);
 			$post['can_moderate'] = $user->isModInSub($GLOBALS['username'], $post['sub']);
+			$post['can_edit'] = $user->isModInSub($GLOBALS['username'], $post['sub']) || $user->isPostAuthor($post['id'], $GLOBALS['username']);
 			$post['raw_text'] = $post['post_text'];
 			$post['post_text'] = $this->parse($post['post_text']);
 			return ($post);
@@ -64,6 +64,7 @@
 		{
 			$user = new user();
 			$comment['can_moderate'] = $user->isModInSub($GLOBALS['username'], $comment['sub']);
+			$comment['can_edit'] = $user->isModInSub($GLOBALS['username'], $comment['sub']) || $user->isCommentAuthor($comment['id'], $GLOBALS['username']);
 			$comment['raw_text'] = $comment['comment_text'];
 			$comment['comment_text'] = $this->parse($comment['comment_text']);
 			return $comment;
