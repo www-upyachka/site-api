@@ -63,10 +63,12 @@
 		public function modifyCommentArray($comment)
 		{
 			$user = new user();
+			$commentObject = new comment();
 			$comment['can_moderate'] = $user->isModInSub($GLOBALS['username'], $comment['sub']);
 			$comment['can_edit'] = $user->isModInSub($GLOBALS['username'], $comment['sub']) || $user->isCommentAuthor($comment['id'], $GLOBALS['username']);
 			$comment['raw_text'] = $comment['comment_text'];
 			$comment['comment_text'] = $this->parse($comment['comment_text']);
+			$comment['children'] = $commentObject->loadChildren($comment['id']);
 			return $comment;
 		}
 
