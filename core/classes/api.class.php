@@ -62,7 +62,7 @@ class api
 				}
 				else
 				{
-					if(!isset($_REQUEST['invite']) || empty($_REQUEST['invite']))
+					if((!isset($_REQUEST['invite']) || empty($_REQUEST['invite'])) && $config['invites_enabled'])
 					{
 						return $this->error("Введите инвайте!!1");
 					}
@@ -70,13 +70,15 @@ class api
 					{
 						$invite = new invite;
 						$check_invite = $invite->info($_REQUEST['invite']);
-						if(empty($check_invite) || $check_invite[0]["is_used"] == 1)
+						$inviteIsNotValid = empty($check_invite) || $check_invite[0]["is_used"] == 1;
+						if($inviteIsNotValid && $config['invites_enabled'])
 						{
 							return $this->error("Инвайте не существуе!!1");
 						}
 						else
 						{
-							$user->register($_REQUEST['login'], md5($_REQUEST['passwd']), $GLOBALS['ip'], $_REQUEST['email'], $check_invite[0]['parent_user']);
+							$parentUser = !$inviteIsNotValid ? $check_invite[0]['parent_user'] : 'root';
+							$user->register($_REQUEST['login'], md5($_REQUEST['passwd']), $GLOBALS['ip'], $_REQUEST['email'], $parentUser);
 							$invite->set_used($_REQUEST['invite']);
 							return $this->success("Зарегано!!1");
 						}
