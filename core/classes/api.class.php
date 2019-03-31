@@ -168,9 +168,12 @@ class api
 				{
 					return $this->error("Уже залогинен");
 				}
-				else
+				else if ($config['free_invites_enabled'])
 				{
 					return $this->success($invite->freeList());
+				}
+				else {
+					return $this->error('Отключено');
 				}
 			}
 		}

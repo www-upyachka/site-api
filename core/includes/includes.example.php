@@ -6,7 +6,8 @@
 		'db_user' => 'koteradue',
 		'db_password' => '101',
 		'db_name' => 'bigdirty',
-		'invites_enabled' => true
+		'invites_enabled' => true,
+		'free_invites_enabled' => false
 	];
 
 	require 'libs/rb.php';
