@@ -14,7 +14,7 @@
 			return $this->infoInSub($GLOBALS['username'], $sub);
 		}
 		public function listInSub($sub) {
-			$list = R::getAll("SELECT * FROM `otake_bans` WHERE `sub` = ? ORDER BY `time` DESC", [$sub]);
+			$list = R::getAll("SELECT * FROM `otake_bans` WHERE `sub` = ? ORDER BY `id` DESC", [$sub]);
 			return $list;
 		}
 		public function byId($id) {
